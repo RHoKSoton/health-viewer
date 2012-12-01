@@ -1,12 +1,10 @@
 /*
  * General style sheet
  */
- 
+
 body		{ font-family:"dejavu sans","arial",sans-Serif; font-size: 82%; margin: 2px; }
 
-#message    { width: 63%; text-align: center; font-weight: bold; border: 0px; }
-
-#speedmap	{ width: 63%; height: 95%; float: left; }
+#speedmap	{ width: 63%; height: 100%; float: left; }
 
 #sidepanel	{ width: 34%; float: left; border: 0px; padding: .5em 0 0 .5em; min-width:100px; }
 
