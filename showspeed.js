@@ -4,7 +4,7 @@
 var ajxuri="getspeeds.php";
 
 var map; // the map variable that holds the map for all Leaflet work
-var hull = new L.LatLng(53.775, -0.356); // the place to start displaying the map
+var hull = new L.LatLng(50.896, -1.404); // the place to start displaying the map
 var xhspeed; // AJaX variable
 
 function init() {
@@ -24,7 +24,14 @@ function init() {
 
 	map.setView(hull,15); // set the map to show in Hull and zoom 14
 	map.addLayer(osm); // add the base Mapnik layer from OSM
-	map.speedLayer = new L.GeoJSON(); // create a new, empty, GeoJSON layer
+	map.speedLayer = new L.GeoJSON(null, {
+        style: function (feature) {
+            return feature.properties.style;
+        },
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup(feature.properties.popupContent);
+        }
+    }); // create a new, empty, GeoJSON layer
 	map.addLayer(map.speedLayer); // Add the layer for later use
 	map.on('moveend', onMapMove); // If the map is moved call onMapMove()
 	askForGJ(); // ask for the GeoJSON data
@@ -74,7 +81,7 @@ function stateChanged() {
 			map.speedLayer.clearLayers();
 			
 			// add the new features, using the embedded style
-			map.speedLayer.on("featureparse", function (e) {
+			/*map.speedLayer.on("featureparse", function (e) {
 				// make the popup work
 				if (e.properties && e.properties.popupContent) {
 					e.layer.bindPopup(e.properties.popupContent);
@@ -83,9 +90,9 @@ function stateChanged() {
 				if (e.properties && e.properties.style && e.layer.setStyle) {
 					e.layer.setStyle(e.properties.style);
 				}
-			});
+			});*/
 		// add the newly generated data to the layer
-		map.speedLayer.addGeoJSON(geojsonFeature);
+		map.speedLayer.addData(geojsonFeature);
 		}
 	}
 }
