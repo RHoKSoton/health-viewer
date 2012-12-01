@@ -16,11 +16,11 @@ function init() {
 	}
 
 	// set up the map
-	map = new L.Map('speedmap'); // use the div called speedmap
+	map = new L.Map('map'); // use the div called speedmap
 
 	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	var osmAttrib='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>';
-	var osm = new L.TileLayer(osmUrl, {minZoom: 14, maxZoom: 18, attribution: osmAttrib});		
+	var osm = new L.TileLayer(osmUrl, {minZoom: 14, maxZoom: 18, attribution: osmAttrib});
 
 	map.setView(soton,15); // set the map to show in Hull and zoom 14
 	map.addLayer(osm); // add the base Mapnik layer from OSM
