@@ -58,20 +58,20 @@ def main():
 	h,u,p,d = hupd() # get the host, username password and database from an import file so it's not hardcoded here
 	conn = mdb.connect(h,u,p,d)
 	croad = conn.cursor()
-	
+
 	# this is a set of hoghway types I'm interested in
-	hwtype=('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','tertiary','residential','unclassified')
-	
+	amenities=('hospital','doctors','dentist')
+
 	# find the ways that are highways
 	for wid in OSM.Ways.keys():
 		way = OSM.Ways[wid]
-		if 'highway' in way.Tags and way.Tags['highway'] in hwtype:
+		if 'amenity' in way.Tags and way.Tags['amenity'] in amenities:
 			# get north, south east & west max
 			n=int(way.Nds[0])
 			north = OSM.Nodes[n].Lat
 			south = OSM.Nodes[n].Lat
 			east = OSM.Nodes[n].Lon
-			west = OSM.Nodes[n].Lon	
+			west = OSM.Nodes[n].Lon
 			for n in way.Nds:
 				if north < OSM.Nodes[int(n)].Lat:
 					north = OSM.Nodes[int(n)].Lat
@@ -81,20 +81,20 @@ def main():
 					east = OSM.Nodes[int(n)].Lon
 				if west > OSM.Nodes[int(n)].Lon:
 					west = OSM.Nodes[int(n)].Lon
-			if 'maxspeed' in way.Tags:
-				ms = way.Tags['maxspeed']
+			if 'name' in way.Tags:
+				name = way.Tags['name']
 			else:
-				ms=''
-			hw=way.Tags['highway']
-			croad.execute("INSERT INTO road (osmid,north,south,east,west,highway,maxspeed) VALUES(%s,%s,%s,%s,%s,%s,%s)",(way.WayID,north,south,east,west,hw,ms))
-			roadid=croad.lastrowid
+				name=''
+			amenity=way.Tags['amenity']
+			croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",(way.WayID,north,south,east,west,amenity,name))
+			wayid=croad.lastrowid
 			for n in way.Nds:
 				lon=OSM.Nodes[int(n)].Lon
 				lat=OSM.Nodes[int(n)].Lat
-				croad.execute("INSERT INTO roadpoints (roadid,lon,lat) VALUES(%s,%s,%s)",(roadid,lon,lat))
-	
+				croad.execute("INSERT INTO mpoints (medicalfacilityid,lon,lat) VALUES(%s,%s,%s)",(wayid,lon,lat))
+
 	conn.close()
-	
+
 
 def get_args(parser):
 	'''parse the command line'''
