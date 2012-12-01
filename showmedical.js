@@ -30,6 +30,9 @@ function init() {
         },
         onEachFeature: function (feature, layer) {
             layer.bindPopup(feature.properties.popupContent);
+            layer.on('click', function(e) {
+                document.getElementById('sidepanel').innerHTML='Coordinate: ' + e.latlng + '\n <a href="http://www.openstreetmap.org/edit?editor=potlatch2&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng +'&zoom=18">Edit</a>';
+            });
         }
     }); // create a new, empty, GeoJSON layer
 	map.addLayer(map.speedLayer); // Add the layer for later use
