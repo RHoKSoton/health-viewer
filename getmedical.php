@@ -49,7 +49,7 @@ while ($row=mysql_fetch_array($resroad)) {
 
 	$ptsquery="SELECT * FROM mpoints WHERE medicalfacilityid='{$medicalfacilityid}' ORDER BY id";
 	$respts=mysql_query($ptsquery);
-	if (mysql_num_rows(respts) > 1) {
+	if (mysql_num_rows($respts) > 1) {
 		$geom=array();
 		$geom['type']="LineString";
 		// This medical facility is defined as a way
@@ -63,6 +63,7 @@ while ($row=mysql_fetch_array($resroad)) {
 		// This facility is defined as a node
 		$geom=array();
 		$geom['type']="Point";
+        $ptsrow=mysql_fetch_array($respts);
 		$geom['coordinates'] = array($ptsrow['lon'],$ptsrow['lat']);
 		$feature['geometry']=$geom;
 	}
