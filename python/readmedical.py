@@ -86,12 +86,26 @@ def main():
 			else:
 				name=''
 			amenity=way.Tags['amenity']
-			croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",(way.WayID,north,south,east,west,amenity,name))
+			croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",\
+                    (way.WayID,north,south,east,west,amenity,name))
 			wayid=croad.lastrowid
 			for n in way.Nds:
 				lon=OSM.Nodes[int(n)].Lon
 				lat=OSM.Nodes[int(n)].Lat
 				croad.execute("INSERT INTO mpoints (medicalfacilityid,lon,lat) VALUES(%s,%s,%s)",(wayid,lon,lat))
+
+    for nid in OSM.Nodes.keys():
+        node = OSM.nodes[nid]
+        if 'amenity' in node.Tags and node.Tags['amenity'] in amenities:
+            lat = node.Lat
+            lon = node.Lon
+            amenity = node.Tags['amenity']
+            name = node.Tags['name']
+            croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",\
+                    (node.NodeID,lat,lat,lon,lon,amenity,name))
+            mfid = croad.lastrowid
+            croad.execute("INSERT INTO mpoints (medicalfacilityid,lon,lat) VALUES(%s,%s,%s)",\
+                    (mfid,lat,lon))
 
 	conn.close()
 

@@ -29,12 +29,12 @@ while ($row=mysql_fetch_array($resroad)) {
 	$prop=array();
 	$prop['osmid']=$row["osmid"];
 	$pstyle=array();
-	$pstyle['stroke']=true;
 	if ($row["amenity"]=='hospital') {
 		$pstyle['color']="red";
 	} else {
 		$pstyle['color']="blue";
 	}
+	$pstyle['stroke']=true;
 	$prop['style']=$pstyle;
 	if ($row["name"]=='') {
 		$prop['popupContent']="No name";
@@ -42,21 +42,30 @@ while ($row=mysql_fetch_array($resroad)) {
 		$prop['popupContent']=$row["name"];
 	}
 	$feature['properties']=$prop;
-	$geom=array();
-	$geom['type']="LineString";
-	$roadcoords=array();
+	$mcoords=array();
 
 	// get the list of lon/lat for the current road
 	$medicalfacilityid=$row['id'];
 
 	$ptsquery="SELECT * FROM mpoints WHERE medicalfacilityid='{$medicalfacilityid}' ORDER BY id";
 	$respts=mysql_query($ptsquery);
-	while ($ptsrow=mysql_fetch_array($respts)) {
-		$ll=array($ptsrow['lon'],$ptsrow['lat']);
-		$roadcoords[]=$ll;
+	if (mysql_num_rows(respts) > 1) {
+		$geom=array();
+		$geom['type']="LineString";
+		// This medical facility is defined as a way
+		while ($ptsrow=mysql_fetch_array($respts)) {
+			$ll=array($ptsrow['lon'],$ptsrow['lat']);
+			$mcoords[]=$ll;
+		}
+		$geom['coordinates']=$mcoords;
+		$feature['geometry']=$geom;
+	} else {
+		// This facility is defined as a node
+		$geom=array();
+		$geom['type']="Point";
+		$geom['coordinates'] = array($ptsrow['lon'],$ptsrow['lat']);
+		$feature['geometry']=$geom;
 	}
-	$geom['coordinates']=$roadcoords;
-	$feature['geometry']=$geom;
 	mysql_free_result($respts);
 
 	// add this to the list of features

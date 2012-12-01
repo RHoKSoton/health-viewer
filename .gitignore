@@ -3,3 +3,4 @@
 include/db.php
 python/hupd.py
 
+.*.swp
