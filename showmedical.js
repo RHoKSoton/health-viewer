@@ -1,10 +1,10 @@
 // Licence: DWYWT v 1.0 See LICENCE file
 
 // the AJaX URI head. Change this if the AJaX server moves. It gets the rest of the URI added later
-var ajxuri="getspeeds.php";
+var ajxuri="getmedical.php";
 
 var map; // the map variable that holds the map for all Leaflet work
-var hull = new L.LatLng(50.896, -1.404); // the place to start displaying the map
+var soton = new L.LatLng(50.896, -1.404); // the place to start displaying the map
 var xhspeed; // AJaX variable
 
 function init() {
@@ -14,15 +14,15 @@ function init() {
 		alert ("This browser does not support HHTP request that the map needs");
 		return;
 	}
-	
+
 	// set up the map
 	map = new L.Map('speedmap'); // use the div called speedmap
-	
+
 	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	var osmAttrib='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>';
 	var osm = new L.TileLayer(osmUrl, {minZoom: 14, maxZoom: 18, attribution: osmAttrib});		
 
-	map.setView(hull,15); // set the map to show in Hull and zoom 14
+	map.setView(soton,15); // set the map to show in Hull and zoom 14
 	map.addLayer(osm); // add the base Mapnik layer from OSM
 	map.speedLayer = new L.GeoJSON(null, {
         style: function (feature) {
@@ -46,10 +46,10 @@ function askForGJ() {
 	var bounds=map.getBounds(); // get the current window the map covers
 	var minll=bounds.getSouthWest(); // create W & W limits
 	var maxll=bounds.getNorthEast(); // create N & E limits
-	
+
 	// build the AJaX URI to send
 	var URI=ajxuri+'?bbox=' + minll.lng + ',' + minll.lat + ',' + maxll.lng + ',' + maxll.lat;
-	
+
 	// fire off an AJaX request
 	// the response will be handled by stateChanged()
 	xhspeed.onreadystatechange = stateChanged; 

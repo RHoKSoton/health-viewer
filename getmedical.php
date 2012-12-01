@@ -13,7 +13,7 @@ list($left,$bottom,$right,$top)=explode(",",$bbox);
 //open the database and get the road
 $chconn = mysql_connect($hostname, $dbuser, $dbpass) or die(mysql_error());
 mysql_select_db($dbname) or die(mysql_error());
-$query=sprintf("SELECT * FROM road WHERE east>='%1.7f' AND west<='%1.7f' AND north>='%1.7f' AND south<='%1.7f'",$left,$right,$bottom,$top);
+$query=sprintf("SELECT * FROM medicalfacility WHERE east>='%1.7f' AND west<='%1.7f' AND north>='%1.7f' AND south<='%1.7f'",$left,$right,$bottom,$top);
 $resroad = mysql_query($query);
 
 $ret=array();
@@ -30,26 +30,26 @@ while ($row=mysql_fetch_array($resroad)) {
 	$prop['osmid']=$row["osmid"];
 	$pstyle=array();
 	$pstyle['stroke']=true;
-	if ($row["maxspeed"]=='') {
+	if ($row["amenity"]=='hospital') {
 		$pstyle['color']="red";
 	} else {
 		$pstyle['color']="blue";
 	}
 	$prop['style']=$pstyle;
-	if ($row["maxspeed"]=='') {
-		$prop['popupContent']="Not set";
+	if ($row["name"]=='') {
+		$prop['popupContent']="No name";
 	} else {
-		$prop['popupContent']=$row["maxspeed"];
+		$prop['popupContent']=$row["name"];
 	}
 	$feature['properties']=$prop;
 	$geom=array();
 	$geom['type']="LineString";
 	$roadcoords=array();
-	
+
 	// get the list of lon/lat for the current road
-	$roadid=$row['roadid'];
-	
-	$ptsquery="SELECT * FROM roadpoints WHERE roadid='{$roadid}' ORDER BY roadpointid";
+	$medicalfacilityid=$row['id'];
+
+	$ptsquery="SELECT * FROM mpoints WHERE medicalfacilityid='{$medicalfacilityid}' ORDER BY id";
 	$respts=mysql_query($ptsquery);
 	while ($ptsrow=mysql_fetch_array($respts)) {
 		$ll=array($ptsrow['lon'],$ptsrow['lat']);
@@ -58,15 +58,15 @@ while ($row=mysql_fetch_array($resroad)) {
 	$geom['coordinates']=$roadcoords;
 	$feature['geometry']=$geom;
 	mysql_free_result($respts);
-	
+
 	// add this to the list of features
 	$features[]=$feature;
-	
+
 }
 $geofeatures['features']=$features;
 $ret['featlist']=$geofeatures;
 
-// tidy up the DB 
+// tidy up the DB
 mysql_free_result($resroad);
 mysql_close($chconn);
 
