@@ -4,7 +4,7 @@
 var ajxuri="getmedical.php";
 
 var map; // the map variable that holds the map for all Leaflet work
-var soton = new L.LatLng(50.896, -1.404); // the place to start displaying the map
+var soton = new L.LatLng(50.92, -1.404); // the place to start displaying the map
 var xhspeed; // AJaX variable
 
 function init() {
@@ -22,7 +22,7 @@ function init() {
 	var osmAttrib='Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA</a>';
 	var osm = new L.TileLayer(osmUrl, {minZoom: 10, maxZoom: 18, attribution: osmAttrib});
 
-	map.setView(soton,15); // set the map to show in Hull and zoom 14
+	map.setView(soton,13); // set the map to show in Hull and zoom 14
 	map.addLayer(osm); // add the base Mapnik layer from OSM
 	map.speedLayer = new L.GeoJSON(null, {
         style: function (feature) {
