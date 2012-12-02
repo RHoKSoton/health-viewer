@@ -7,7 +7,7 @@ var map; // the map variable that holds the map for all Leaflet work
 var soton = new L.LatLng(50.92, -1.404); // the place to start displaying the map
 var xhspeed; // AJaX variable
 
-function keys(obj) {
+function getKeys(obj) {
     var keys = [];
 
     for(var key in obj) {
@@ -19,14 +19,18 @@ function keys(obj) {
     return keys;
 }
 
-function onFeatureClick(e) {
-	var sidepanel = document.getElementById('sidepanel');
-	var innerHTML = 'Coordinate: ' + e.latlng + '\n <a href="http://www.openstreetmap.org/edit?editor=potlatch2&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng +'&zoom=18">Edit</a>';
-	innerHTML = innerHTML + "<table border=1><tr><td>Key</td><td>Value</td></tr>";
-	for (key in keys(e.properties)) {
-		innerHTML = innerHTML + "<tr><td>" + key + "</td><td>" + e[key] + "</td></tr>";
-	}
-	sidepanel.innerHTML = innerHTML;
+function onFeatureClick(feature) {
+    return function(e) {
+        var sidepanel = document.getElementById('sidepanel');
+        var innerHTML = 'Coordinate: ' + e.latlng + '\n <a href="http://www.openstreetmap.org/edit?editor=potlatch2&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng +'&zoom=18">Edit</a>';
+        innerHTML = innerHTML + "<table border=1><tr><td>Key</td><td>Value</td></tr>";
+        var keys = getKeys(feature.properties);
+        for (i in keys) {
+            var key = keys[i];
+            innerHTML = innerHTML + "<tr><td>" + key + "</td><td>" + feature.properties[key] + "</td></tr>";
+        }
+        sidepanel.innerHTML = innerHTML;
+    }
 }
 
 function init() {
@@ -51,8 +55,7 @@ function init() {
             return feature.properties.style;
         },
         onEachFeature: function (feature, layer) {
-            layer.bindPopup(feature.properties.popupContent);
-            layer.on('click', onFeatureClick);
+            layer.on('click', onFeatureClick(feature));
         }
     }); // create a new, empty, GeoJSON layer
 	map.addLayer(map.speedLayer); // Add the layer for later use

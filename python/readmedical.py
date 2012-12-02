@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# process an OSM file to extract roads 
+# process an OSM file to extract roads
 
 # Licence: DWYWT v 1.0 See LICENCE file
 
@@ -24,17 +24,17 @@ def main():
     arga=get_args(parser)
     results = parser.parse_args()
     if arga.inosm=='':
-        print '{0} version {1}'.format(__progdesc__,__version__) 
+        print '{0} version {1}'.format(__progdesc__,__version__)
         print 'OSM file name is required (-i)'
         sys.exit(4)
     if not os.path.exists(arga.inosm):
-        print '{0} version {1}'.format(__progdesc__,__version__) 
+        print '{0} version {1}'.format(__progdesc__,__version__)
         print 'OSM file {0} cannot be found'.format(arga.inosm)
         sys.exit(5)
     if arga.verbose:
         arga.quiet=False
     if not arga.quiet:
-        print '{0} version {1}'.format(__progdesc__,__version__) 
+        print '{0} version {1}'.format(__progdesc__,__version__)
     if arga.verbose:
         print 'Input OSM file: {0}'.format(arga.inosm)
         print 'Text ouput file: {0}'.format(arga.outtxt)
@@ -81,18 +81,15 @@ def main():
                     east = OSM.Nodes[int(n)].Lon
                 if west > OSM.Nodes[int(n)].Lon:
                     west = OSM.Nodes[int(n)].Lon
-            if 'name' in way.Tags:
-                name = way.Tags['name']
-            else:
-                name=''
-            amenity=way.Tags['amenity']
-            croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",\
-                    (way.WayID,north,south,east,west,amenity,name))
+            croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west) VALUES(%s,%s,%s,%s,%s)",\
+                    (way.WayID,north,south,east,west))
             wayid=croad.lastrowid
             for n in way.Nds:
                 lon=OSM.Nodes[int(n)].Lon
                 lat=OSM.Nodes[int(n)].Lat
                 croad.execute("INSERT INTO mpoints (medicalfacilityid,lon,lat) VALUES(%s,%s,%s)",(wayid,lon,lat))
+            for tag in way.Tags:
+                croad.execute("INSERT INTO tags (medicalfacilityid,okey,oval) VALUES(%s,%s,%s)",(wayid,tag,way.Tags[tag]))
 
     for nid in OSM.Nodes.keys():
         node = OSM.Nodes[nid]
@@ -104,11 +101,13 @@ def main():
                 name = node.Tags['name']
             else:
                 name=''
-            croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west,amenity,name) VALUES(%s,%s,%s,%s,%s,%s,%s)",\
-                    (node.NodeID,lat,lat,lon,lon,amenity,name))
+            croad.execute("INSERT INTO medicalfacility (osmid,north,south,east,west) VALUES(%s,%s,%s,%s,%s)",\
+                    (node.NodeID,lat,lat,lon,lon))
             mfid = croad.lastrowid
             croad.execute("INSERT INTO mpoints (medicalfacilityid,lon,lat) VALUES(%s,%s,%s)",\
                     (mfid,lat,lon))
+            for tag in node.Tags:
+                croad.execute("INSERT INTO tags (medicalfacilityid,okey,oval) VALUES(%s,%s,%s)",(node.NodeID,tag,node.Tags[tag]))
 
     conn.close()
 

@@ -11,7 +11,7 @@ $bbox=$_GET['bbox'];
 list($left,$bottom,$right,$top)=explode(",",$bbox);
 
 //open the database and get the road
-$chconn = mysql_connect($hostname, $dbuser, $dbpass) or die(mysql_error());
+$chconn = mysql_connect($dbhost, $dbuser, $dbpass) or die(mysql_error());
 mysql_select_db($dbname) or die(mysql_error());
 $query=sprintf("SELECT * FROM medicalfacility WHERE east>='%1.7f' AND west<='%1.7f' AND north>='%1.7f' AND south<='%1.7f'",$left,$right,$bottom,$top);
 $resroad = mysql_query($query);
@@ -28,19 +28,27 @@ while ($row=mysql_fetch_array($resroad)) {
 	$feature['type']="Feature";
 	$prop=array();
 	$prop['osmid']=$row["osmid"];
+
+	// get the list of lon/lat for the current road
+	$medicalfacilityid=$row['id'];
 	$pstyle=array();
-	if ($row["amenity"]=='hospital') {
-		$pstyle['color']="red";
-	} else {
-		$pstyle['color']="blue";
-	}
+
+	$ptsquery="SELECT * FROM tags WHERE medicalfacilityid='{$medicalfacilityid}' ORDER BY id";
+	$respts=mysql_query($ptsquery);
+    while ($ptsrow=mysql_fetch_array($respts)) {
+        $prop[$ptsrow['okey']]=$ptsrow['oval'];
+        if ($ptsrow['okey']=='amenity') {
+            if ($ptsrow['oval'] == 'hospital') {
+                $pstyle['color']="red";
+            } else {
+                $pstyle['color']="blue";
+            }
+        }
+    }
+	mysql_free_result($respts);
+
 	$pstyle['stroke']=true;
 	$prop['style']=$pstyle;
-	if ($row["name"]=='') {
-		$prop['popupContent']="No name";
-	} else {
-		$prop['popupContent']=$row["name"];
-	}
 	$feature['properties']=$prop;
 	$mcoords=array();
 

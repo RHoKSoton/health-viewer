@@ -5,7 +5,5 @@ CREATE TABLE IF NOT EXISTS medicalfacility (
   south double NOT NULL,
   east double NOT NULL,
   west double NOT NULL,
-  name varchar(255) NOT NULL,
-  amenity varchar(64) NOT NULL,
   PRIMARY KEY (id)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;
