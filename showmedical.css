@@ -4,8 +4,10 @@
 
 body		{ font-family:"dejavu sans","arial",sans-Serif; font-size: 82%; margin: 2px; }
 
-#map	    { width: 63%; height: 100%; float: left; }
+#key	    { width: 15%; height: 100%; float: right; min-width:100px; }
 
-#sidepanel	{ width: 34%; float: left; border: 0px; padding: .5em 0 0 .5em; min-width:100px; }
+#map	    { width: 69%; height: 100%; float: left; }
+
+#sidepanel	{ width: 15%; float: left; border: 0px; padding: .5em 0 0 .5em; min-width:100px; }
 
 #bottom		{ clear: both; border: solid 1px black; }
