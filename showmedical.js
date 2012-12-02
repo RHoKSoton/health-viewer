@@ -7,6 +7,28 @@ var map; // the map variable that holds the map for all Leaflet work
 var soton = new L.LatLng(50.92, -1.404); // the place to start displaying the map
 var xhspeed; // AJaX variable
 
+function keys(obj) {
+    var keys = [];
+
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key)) {
+            keys.push(key);
+        }
+    }
+
+    return keys;
+}
+
+function onFeatureClick(e) {
+	var sidepanel = document.getElementById('sidepanel');
+	var innerHTML = 'Coordinate: ' + e.latlng + '\n <a href="http://www.openstreetmap.org/edit?editor=potlatch2&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng +'&zoom=18">Edit</a>';
+	innerHTML = innerHTML + "<table border=1><tr><td>Key</td><td>Value</td></tr>";
+	for (key in keys(e.properties)) {
+		innerHTML = innerHTML + "<tr><td>" + key + "</td><td>" + e[key] + "</td></tr>";
+	}
+	sidepanel.innerHTML = innerHTML;
+}
+
 function init() {
 	// ajax stuff
 	xhspeed=GetXmlHttpObject();
@@ -30,9 +52,7 @@ function init() {
         },
         onEachFeature: function (feature, layer) {
             layer.bindPopup(feature.properties.popupContent);
-            layer.on('click', function(e) {
-                document.getElementById('sidepanel').innerHTML='Coordinate: ' + e.latlng + '\n <a href="http://www.openstreetmap.org/edit?editor=potlatch2&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng +'&zoom=18">Edit</a>';
-            });
+            layer.on('click', onFeatureClick);
         }
     }); // create a new, empty, GeoJSON layer
 	map.addLayer(map.speedLayer); // Add the layer for later use
@@ -55,7 +75,7 @@ function askForGJ() {
 
 	// fire off an AJaX request
 	// the response will be handled by stateChanged()
-	xhspeed.onreadystatechange = stateChanged; 
+	xhspeed.onreadystatechange = stateChanged;
 	xhspeed.open('GET', URI, true);
 	xhspeed.send(null);
 }
@@ -75,7 +95,8 @@ function GetXmlHttpObject() {
 function stateChanged() {
 	// if AJAX returned a position, move the map there
 	if (xhspeed.readyState==4) {
-		//use the info here that was returned
+	
+	//use the info here that was returned
 		if (xhspeed.status==200) {
 			var ret=eval("(" + xhspeed.responseText + ")");
 			var geojsonFeature=ret.featlist;
@@ -94,8 +115,8 @@ function stateChanged() {
 					e.layer.setStyle(e.properties.style);
 				}
 			});*/
-		// add the newly generated data to the layer
-		map.speedLayer.addData(geojsonFeature);
+			// add the newly generated data to the layer
+			map.speedLayer.addData(geojsonFeature);
 		}
 	}
 }
